@@ -1,0 +1,17 @@
+#Image policy
+apiVersion: image.toolkit.fluxcd.io/v1beta1
+kind: ImagePolicy
+metadata:
+  env_file:
+    - .env
+  envirment: 
+    - NAMESPACE = ${NAMESPACE} 
+    - IMAGE_NAME = $(IMAGE_NAME) 
+  name: IMAGE_NAME-policy
+  namespace: NAMESPACE
+spec:
+  imageRepositoryRef:
+    IMAGE_NAME-repo
+  policy:
+    numerical:
+      order: asc

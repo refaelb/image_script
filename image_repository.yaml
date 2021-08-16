@@ -1,0 +1,17 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta1
+kind: ImageRepository
+metadata:
+  name: imagename-repo
+  namespace: namespace
+  env_file:
+    - .env
+  envirment: 
+    - namespace = ${NAMESPACE} 
+    - image_name = $(IMAGE_NAME) 
+
+    
+spec:
+  secretRef:
+    name: regecd
+  image: rabazhub.azurecr.io/${{image_name}}
+  interval: 1m0s

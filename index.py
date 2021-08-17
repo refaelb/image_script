@@ -10,18 +10,47 @@ args = parser.parse_args()
 namespace = (args.namespace)
 imageFile = (args.file_path)
 
-input_file = open(imageFile,"r") 
-for line in input_file.readlines():
+input_file = open(imageFile,"r")
+# input_file = input_file.splitlines()
+for lines in input_file.read().split():
+    line = lines[lines.find("/")+1:] 
     Path(line).mkdir(parents=True, exist_ok=True)
     env = open(line+'/.env',"w+")
     read_env = env.write(str('NAMESPACE='+namespace+'\nIMAGE_NAME='+line))
-    repository = open('image_repository.yaml',"r+")
-    read_repository = yaml.safe_load(repository)
+
+    data ="""
+    apiVersion: image.toolkit.fluxcd.io/v1beta1
+    kind: ImageRepository
+    metadata:
+        name: {}
+        namespace: {}
+    spec:
+        secretRef:
+            name: regecd
+    image: rabazhub.azurecr.io/test
+    interval: 1m0s
+""".format(line, namespace)
+
     file = open(line+"/image repository.yaml","w+")
-    yaml.dump(read_repository, file)
+    docs = yaml.load(data,  Loader=yaml.FullLoader)
+    yaml.dump(docs, file)
     file.close()
-    policy = open('image_policy.yaml',"r+")
-    read_policy = yaml.safe_load(policy)
+
+    data="""
+    #Image policy
+    apiVersion: image.toolkit.fluxcd.io/v1beta1
+    kind: ImagePolicy
+    metadata:
+        name: {}-policy
+        namespace: {}
+    spec:
+        imageRepositoryRef:
+            name: {}-repo
+        policy:
+            numerical:
+                 order: asc
+    """.format(line, namespace, line)
     file = open(line+"/image policy.yaml","w+")
-    yaml.dump(read_policy, file)
+    docs = yaml.load(data,  Loader=yaml.FullLoader)
+    yaml.dump(docs, file)
     file.close()

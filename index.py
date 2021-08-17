@@ -1,4 +1,4 @@
-from os import read, write
+from os import read, write, chdir
 from pathlib import Path
 import yaml
 import argparse
@@ -11,12 +11,11 @@ namespace = (args.namespace)
 imageFile = (args.file_path)
 
 input_file = open(imageFile,"r")
-# input_file = input_file.splitlines()
+Path("home_dir").mkdir(parents=True, exist_ok=True)
+chdir("./home_dir")
 for lines in input_file.read().split():
     line = lines[lines.find("/")+1:] 
     Path(line).mkdir(parents=True, exist_ok=True)
-    env = open(line+'/.env',"w+")
-    read_env = env.write(str('NAMESPACE='+namespace+'\nIMAGE_NAME='+line))
 
     data ="""
     apiVersion: image.toolkit.fluxcd.io/v1beta1

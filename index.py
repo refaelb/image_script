@@ -6,16 +6,20 @@ import argparse
 parser = argparse.ArgumentParser(description='Personal information')
 parser.add_argument('-n', dest='namespace', type=str, help='namespace')
 parser.add_argument('-f', dest='file_path', type=str, help='file path')
+parser.add_argument('-o', dest='output_dir', type=str, help='file path')
 args = parser.parse_args()
 namespace = (args.namespace)
 imageFile = (args.file_path)
-
+output_dir = (args.output_dir)
+caunt=0
 input_file = open(imageFile,"r")
+chdir(output_dir)
 Path("home_dir").mkdir(parents=True, exist_ok=True)
 chdir("./home_dir")
 for lines in input_file.read().split():
     line = lines[lines.find("/")+1:] 
     Path(line).mkdir(parents=True, exist_ok=True)
+    caunt=(caunt)+1
 
     data ="""
     apiVersion: image.toolkit.fluxcd.io/v1beta1
@@ -53,3 +57,6 @@ for lines in input_file.read().split():
     docs = yaml.load(data,  Loader=yaml.FullLoader)
     yaml.dump(docs, file)
     file.close()
+print("successful you have: "+str(caunt)+" services;")
+print("please create secret, use in this command: \nkubectl create secret generic regecd  \n --from-file=.dockerconfigjson=<path/to/.docker/config.json> \n --type=kubernetes.io/dockerconfigjson ")
+print("or use: \n kubectl create secret docker-registry regcred \n --docker-server=<your-registry-server> \n --docker-username=<your-name> \n --docker-password=<your-pword> \n --docker-email=<your-email>")
